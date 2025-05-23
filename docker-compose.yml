@@ -35,8 +35,6 @@ dns:
 cap_add:
 - NET_ADMIN
 - SYS_PTRACE
-driver: bridge
-ipam:
 driver: default
 config:
 - subnet: 172.20.0.0/16
