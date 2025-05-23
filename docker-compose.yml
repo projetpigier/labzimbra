@@ -1,41 +1,53 @@
 version: '3'
-services:
-zimbra:
-image: jorgedlcruz/zimbra:latest
-container_name: zimbra
-hostname: mail.zimbralab.local
-restart: always
-volumes:
-- zimbra_conf:/opt/zimbra/conf
-- zimbra_data:/opt/zimbra/store
-- zimbra_log:/opt/zimbra/log
-- zimbra_index:/opt/zimbra/index
-- zimbra_db:/opt/zimbra/db
-ports:
-- "25:25" # SMTP
-- "80:80" # HTTP
-- "443:443" # HTTPS
-- "587:587" # SMTP MSA
-- "110:110" # POP3
-- "143:143" # IMAP
-- "465:465" # SMTPS
-- "993:993" # IMAPS
-- "995:995" # POP3S
-- "7071:7071" # Admin Console
-- "8443:8443" # Proxy HTTPS
-- "9071:9071" # Admin Console HTTPS
-environment:
-- PASSWORD=Pigier@123456 # Mot de passe admin de Zimbra
-networks:
-zimbra_network:
-ipv4_address: 172.20.0.2
-dns:
-- 8.8.8.8
-- 8.8.4.4
-cap_add:
-- NET_ADMIN
-- SYS_PTRACE
-driver: default
-config:
-- subnet: 172.20.0.0/16
 
+services:
+  zimbra:
+    image: jorgedlcruz/zimbra:latest
+    container_name: zimbra
+    hostname: mail.zimbralab.local
+    restart: always
+    volumes:
+      - zimbra_conf:/opt/zimbra/conf
+      - zimbra_data:/opt/zimbra/store
+      - zimbra_log:/opt/zimbra/log
+      - zimbra_index:/opt/zimbra/index
+      - zimbra_db:/opt/zimbra/db
+    ports:
+      - "25:25"      # SMTP
+      - "80:80"      # HTTP
+      - "443:443"    # HTTPS
+      - "587:587"    # SMTP MSA
+      - "110:110"    # POP3
+      - "143:143"    # IMAP
+      - "465:465"    # SMTPS
+      - "993:993"    # IMAPS
+      - "995:995"    # POP3S
+      - "7071:7071"  # Admin Console
+      - "8443:8443"  # Proxy HTTPS
+      - "9071:9071"  # Admin Console HTTPS
+    environment:
+      - PASSWORD=Lab@123456  # Mot de passe admin de Zimbra
+    networks:
+      zimbra_network:
+        ipv4_address: 172.20.0.2
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    cap_add:
+      - NET_ADMIN
+      - SYS_PTRACE
+
+networks:
+  zimbra_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  zimbra_conf:
+  zimbra_data:
+  zimbra_log:
+  zimbra_index:
+  zimbra_db:
