@@ -35,16 +35,9 @@ dns:
 cap_add:
 - NET_ADMIN
 - SYS_PTRACE
-networks:
-zimbra_network:
 driver: bridge
 ipam:
 driver: default
 config:
 - subnet: 172.20.0.0/16
-volumes:
-zimbra_conf:
-zimbra_data:
-zimbra_log:
-zimbra_index:
-zimbra_db:
+
