@@ -1,53 +1,62 @@
-version: '3'
-
+#<one line to give the program's name and a brief idea of what it does.>
+#    Copyright (C) 2021 iWayVietnam
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>
+version: '3.2'
 services:
-  zimbra:
-    image: jorgedlcruz/zimbra:latest
-    container_name: zimbra
-    hostname: mail.zimbralab.local
-    restart: always
-    volumes:
-      - zimbra_conf:/opt/zimbra/conf
-      - zimbra_data:/opt/zimbra/store
-      - zimbra_log:/opt/zimbra/log
-      - zimbra_index:/opt/zimbra/index
-      - zimbra_db:/opt/zimbra/db
-    ports:
-      - "25:25"      # SMTP
-      - "80:80"      # HTTP
-      - "443:443"    # HTTPS
-      - "587:587"    # SMTP MSA
-      - "110:110"    # POP3
-      - "143:143"    # IMAP
-      - "465:465"    # SMTPS
-      - "993:993"    # IMAPS
-      - "995:995"    # POP3S
-      - "7071:7071"  # Admin Console
-      - "8443:8443"  # Proxy HTTPS
-      - "9071:9071"  # Admin Console HTTPS
-    environment:
-      - PASSWORD=Lab@123456  # Mot de passe admin de Zimbra
-    networks:
-      zimbra_network:
-        ipv4_address: 172.20.0.2
-    dns:
-      - 8.8.8.8
-      - 8.8.4.4
-    cap_add:
-      - NET_ADMIN
-      - SYS_PTRACE
-
+  dns-server:
+      image: 4km3/dnsmasq
+      container_name: dns-servers
+      restart: always
+      ports:
+        - '53:53/tcp'
+        - '53:53/udp'
+      cap_add:
+        - NET_ADMIN
+      command: --address=/iwaytest2.com/10.0.0.2 --domain=iwaytest2.com --mx-host=iwaytest2.com,mail.iwaytest2.com,0
+      networks:
+        vpcbr:
+          ipv4_address: 10.0.0.2
+  zimbra_all:
+      image: iwayvietnam/zimbra_all
+      container_name: zimbra-iwaytest2
+      hostname: mail.iwaytest2.com
+      ports:
+          - '25:25'
+          - '80:80'
+          - '465:465'
+          - '587:587'
+          - '110:110'
+          - '143:143'
+          - '993:993'
+          - '995:995'
+          - '443:443'
+          - '3443:3443'
+          - '9071:9071'
+      dns:
+          - 10.0.0.2
+      volumes:
+          - './zimbra-storage:/opt/zimbra:rw'
+      environment:
+          - PASSWORD=Zimbra2021
+          #- LOGSTASH_IP=192.168.100.252 #if you want to push logs to Logstash (optional)
+      networks:
+        vpcbr:
+          ipv4_address: 10.0.0.3
 networks:
-  zimbra_network:
+  vpcbr:
     driver: bridge
     ipam:
-      driver: default
-      config:
-        - subnet: 172.20.0.0/16
-
-volumes:
-  zimbra_conf:
-  zimbra_data:
-  zimbra_log:
-  zimbra_index:
-  zimbra_db:
+     config:
+       - subnet: 10.0.0.0/24
